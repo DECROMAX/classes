@@ -30,16 +30,16 @@ class Fighter:
         return self.height * 3.28084
 
     def win_percentage(self):
-        return self.wins / self.total
+        return f'{self.wins / self.total:.2%}'
 
     def loss_percentage(self):
-        return self.losses / self.total
+        return f'{self.losses / self.total:.2%}'
 
     def sub_percentage(self):
-        return self.sub / self.total
+        return f'{self.sub / self.total:.2%}'
 
     def ko_percenatge(self):
-        return self.ko / self.total
+        return f'{self.ko / self.total:.2%}'
 
     def age(self):
         today = date.today()
@@ -48,5 +48,3 @@ class Fighter:
 
 GPierre = Fighter('George', 'St Pierre', 'Rush', '1981-5-19', 77, 1.78, 26, 2, 0, 8, 6)
 CMcgregor = Fighter('Connor', 'Mc Gregor', 'Notorious', '1988-7-14', 70, 1.75, 22, 6, 0, 19, 4)
-
-print(f'{GPierre.fullname()} KO%: {GPierre.ko_percenatge():.2%}')
