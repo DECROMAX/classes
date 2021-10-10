@@ -1,27 +1,49 @@
 from datetime import date, timedelta
 from datetime import datetime
 
+
 class Fighter:
 
-    def __init__(self, first_name, last_name, nickname, dob, weight_kg, height, wins, losses, draws, ko, sub):
+    def __init__(self, first_name, last_name, full_name, nickname, image_url, fighter_url, dob, location,
+                 nationality, association, weight_kg, weight_class, height, wins, losses,  win_ko,
+                 win_submission, win_decision, loss_ko, loss_submission, loss_decision):
+
         self.first_name = first_name
         self.last_name = last_name
+        self.full_name = full_name
         self.nickname = nickname
+
+        self.image_url = image_url
+        self.fighter_url = fighter_url
+
         self.dob = datetime.strptime(dob, '%Y-%m-%d')
-        self.weight_kg = weight_kg
+        self.location = location
+        self.nationality = nationality
+        self.association = association
+
         self.height = height
+        self.weight_kg = weight_kg
+        self.weight_class = weight_class
+
         self.wins = wins
         self.losses = losses
-        self.total = self.wins + self.losses
-        self.draws = draws
-        self.ko = ko
-        self.sub = sub
+
+        self.win_ko = win_ko
+        self.win_submission = win_submission
+        self.win_decision = win_decision
+
+        self.loss_by_ko = loss_ko
+        self.loss_submission = loss_submission
+        self.loss_decision = loss_decision
+
+        self.total_fights = self.wins + self.losses
+
 
     def fullname(self):
         return f'{self.first_name} {self.last_name}'
 
     def fight_record(self):
-        return f'{self.wins}-{self.draws}-{self.losses}'
+        return f'W{self.wins}-L{self.losses}'
 
     def weight_lb(self):
         return self.weight_kg * 2.20462
@@ -35,16 +57,13 @@ class Fighter:
     def loss_percentage(self):
         return f'{self.losses / self.total:.2%}'
 
-    def sub_percentage(self):
-        return f'{self.sub / self.total:.2%}'
+    def win_sub_percentage(self):
+        return f'{self.win_submission / self.total:.2%}'
 
-    def ko_percenatge(self):
-        return f'{self.ko / self.total:.2%}'
+    def win_ko_percenatge(self):
+        return f'{self.win_ko / self.total:.2%}'
 
     def age(self):
         today = date.today()
         return today.year - self.dob.year - ((today.month, today.day) < (self.dob .month, self.dob .day))
 
-
-GPierre = Fighter('George', 'St Pierre', 'Rush', '1981-5-19', 77, 1.78, 26, 2, 0, 8, 6)
-CMcgregor = Fighter('Connor', 'Mc Gregor', 'Notorious', '1988-7-14', 70, 1.75, 22, 6, 0, 19, 4)

@@ -24,84 +24,100 @@ def parse_dataframe():
         urls.append(f'https://www.sherdog.com/{fighter}')
 
 
-
 def get_fighter_meta(fighter_urls):
     """Scrapes meta from fighters page"""
-    for counter, fighter_url in enumerate(fighter_urls, start=1):
-        soup = get_soup(fighter_url)
+    try:
+        for counter, fighter_page in enumerate(fighter_urls, start=1):
+            soup = get_soup(fighter_page)
 
-        first_name = soup.find('span', class_='fn').text.strip().split()[0]
-        last_name = soup.find('span', class_='fn').text.strip().split()[1]
-        full_name = f'{first_name} {last_name}'
-        try:
-            nickname = soup.find('span', class_='nickname').text.strip()
-        except (AttributeError, IndexError):
-            nickname = ' '
-        image_url = f"https://www.sherdog.com/{soup.find('img', class_='profile_image photo')['src']}"
+            first_name = soup.find('span', class_='fn').text.strip().split()[0]
+            last_name = soup.find('span', class_='fn').text.strip().split()[1]
+            full_name = f'{first_name} {last_name}'
+            try:
+                nickname = soup.find('span', class_='nickname').text.strip()
+            except (AttributeError, IndexError):
+                nickname = ' '
+            image_url = f"https://www.sherdog.com/{soup.find('img', class_='profile_image photo')['src']}"
+            fighter_url = fighter_page
 
-        try:
-            dob = soup.find('span', attrs={'itemprop': 'birthDate'}).text.strip()
-        except (AttributeError, IndexError):
-            dob = ' '
+            try:
+                dob = soup.find('span', attrs={'itemprop': 'birthDate'}).text.strip()
+            except (AttributeError, IndexError):
+                dob = ' '
 
-        try:
-            location = soup.find('span', class_='locality').text.strip()
-        except (AttributeError, IndexError):
-            location = ''
-        nationality = soup.find('strong', attrs={'itemprop': 'nationality'}).text.strip()
+            try:
+                location = soup.find('span', class_='locality').text.strip()
+            except (AttributeError, IndexError):
+                location = ''
 
-        try:
-            association = soup.find('span', attrs={'itemprop': 'name'}).text.strip()
-        except (AttributeError, IndexError):
-            association = ' '
+            try:
+                nationality = soup.find('strong', attrs={'itemprop': 'nationality'}).text.strip()
+            except (AttributeError, IndexError):
+                nationality = ''
 
-        height = soup.find('span', class_='item height').text.strip()[-9:-2]
-        weight = soup.find('span', class_='item weight').text.strip()[-9:-2].strip()
-        weight_class = soup.find('strong', class_='title').text.strip()
+            try:
+                association = soup.find('span', attrs={'itemprop': 'name'}).text.strip()
+            except (AttributeError, IndexError):
+                association = ' '
 
-        win_loss_loop = [i.text.strip() for i in soup.find_all('span', class_='counter')]
+            height = soup.find('span', class_='item height').text.strip()[-9:-2]
+            weight_kg = soup.find('span', class_='item weight').text.strip()[-9:-2].strip()
+            weight_class = soup.find('strong', class_='title').text.strip()
 
-        wins = win_loss_loop[0]
-        losses = win_loss_loop[1]
+            win_loss_loop = [i.text.strip() for i in soup.find_all('span', class_='counter')]
 
-        graph_tag_loop = [i.text.strip() for i in soup.find_all('span', class_='graph_tag')]
+            wins = win_loss_loop[0]
+            losses = win_loss_loop[1]
 
-        win_ko = graph_tag_loop[0][:2].strip()
-        win_submission = graph_tag_loop[1][:2].strip()
-        win_decisions = graph_tag_loop[2][:2].strip()
+            graph_tag_loop = [i.text.strip() for i in soup.find_all('span', class_='graph_tag')]
 
-        loss_ko = graph_tag_loop[3][0][:2].strip()
-        loss_submission = graph_tag_loop[4][:2].strip()
-        loss_decisions = graph_tag_loop[5][:2].strip()
+            win_by_ko = graph_tag_loop[0][:2].strip()
+            win_submission = graph_tag_loop[1][:2].strip()
+            win_decisions = graph_tag_loop[2][:2].strip()
 
-        fighter_meta = {
-            'First_name': first_name,
-            'Last_name': last_name,
-            'Full name': full_name,
-            'Nickname': nickname,
-            'Image_url': image_url,
-            'Date_of_birth': dob,
-            'Location': location,
-            'Nationality': nationality,
-            'Association': association,
-            'Height': height,
-            'Weight': weight,
-            'Weight_class': weight_class,
-            'Wins': wins,
-            'Losses': losses,
-            'Win_by_ko': win_ko,
-            'Win_by_submission': win_submission,
-            'Win_decision': win_decisions,
-            'Loss_by_ko': loss_ko,
-            'Loss_by_submission': loss_submission,
-            'Loss_by_desision': loss_decisions
-        }
-        fighter_data.append(fighter_meta)
-        print(f'Saving: {full_name} {image_url}  - {counter} of {len(fighter_urls)}')
+            loss_ko = graph_tag_loop[3][0][:2].strip()
+            loss_submission = graph_tag_loop[4][:2].strip()
+            loss_decisions = graph_tag_loop[5][:2].strip()
+
+            fighter_meta = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'full_name': full_name,
+                'nickname': nickname,
+                'image_url': image_url,
+                'fighter_url': fighter_url,
+                'dob': dob,
+                'location': location,
+                'nationality': nationality,
+                'association': association,
+                'height': height,
+                'weight_kg': weight_kg,
+                'weight_class': weight_class,
+                'wins': wins,
+                'losses': losses,
+                'win_by_ko': win_by_ko,
+                'win_submission': win_submission,
+                'win_decision': win_decisions,
+                'loss_ko': loss_ko,
+                'loss_submission': loss_submission,
+                'loss_decisions': loss_decisions
+            }
+            fighter_data.append(fighter_meta)
+            print(f'Saving: {full_name} {image_url}  - {counter} of {len(fighter_urls)}')
+
+    except(AttributeError, IndexError):
+        print('Error saving')
+        pass
+
+
+def load(fighter_data):
+    df = pd.DataFrame(fighter_data)
+    df.to_csv('sherdog_fighters.csv', index=False)
 
 
 def main():
     parse_dataframe()
     get_fighter_meta(urls)
+    load(fighter_data)
 
 main()
